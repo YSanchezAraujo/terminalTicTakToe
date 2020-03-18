@@ -55,5 +55,15 @@ void init_board() {
 int main() {
     // spit out initial board to players
     init_board();
+    int playGame = 1;
+    int playerInput;
+    // initial mechanism for keeping the game going
+    do {
+	std::cout << "Do you want to play this game?";
+        std::cin >> playerInput;
+        if (playerInput == 0) {
+	    playGame = 0;
+	}
+    } while (playGame == 1);
     return 0;
 }
