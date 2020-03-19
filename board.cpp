@@ -59,44 +59,74 @@ void print_array(int arr[5], int pn) {
     std::cout << std::endl;
 }
 
+bool is_valid(int pinp, int endr, int p1arr[5], int p2arr[5]) {
+    bool found = false;
+    bool fi = true;
+
+    for (int r = 1; r < endr; ++r) {
+	if (pinp == r) {
+	    found = true;
+	    break;
+	}
+    }
+
+    for (int qq = 0; qq < 5; ++qq) {
+	if (p1arr[qq] == pinp || p2arr[qq] == pinp) {
+	    fi = false;
+	    break;
+	}
+    }
+
+    return (found && fi);
+}
+
 int main() {
     // spit out initial board to players
     init_board();
     int playGame = 1; // play state
     int playerInput = 0; // player moves variable
-    int player = 0; // tracker for whose turn it is
-
+    int player = -1; // tracker for whose turn it is
+    int EXIT_COMMAND = 18303;
     // create move history here
     int player1Moves[5] = {0, 0, 0, 0, 0};
     int player2Moves[5] = {0, 0, 0, 0, 0};
     int player1N = 0;
     int player2N = 0;
-
+    int curPlayer = 1;
+    int MAX_INP_ALLOWED = 10;
+    bool valid_move = false;
     // how to quit
-    std::cout << "to exit the program enter the number 18303" << std::endl;
+    std::cout << "to exit the program enter the number " << EXIT_COMMAND << std::endl;
     // initial mechanism for keeping the game going
     do {
-	// so the way the moves are being stored here is off
-	// ok need to go do something actually productive, tbd
-        if (player % 2 == 0 ? true : false) {
-	    std::cout << "Player 1 enter your move: " << std::endl;
-            player1Moves[player1N] = playerInput;
-	    ++player1N;
-	    print_array(player1Moves, player1N);
-	} else {
-	    std::cout << "Player 2 enter your move: " << std::endl;
-	    player2Moves[player2N] = playerInput;
-	    ++player2N;
-	    print_array(player2Moves, player2N);
-	}
-	++player;
-	// input from user(s)
+	curPlayer = player % 2 == 0 ? 1 : 2;
+	std::cout << "Player " << curPlayer << " enter your move: ";
 	std::cin >> playerInput;
-	// check if game should end
-        if (playerInput == 18303 || player2N > 4 || player1N > 4) {
+	// ok this is sorta getting to the correct place
+	if (!std::cin.fail()) {
+	    valid_move = is_valid(playerInput, MAX_INP_ALLOWED, player1Moves, player2Moves);
+	    while (!valid_move) {
+		std::cout << "invalid move, try again" << std::endl;
+		std::cin >> playerInput;
+		valid_move = is_valid(playerInput, MAX_INP_ALLOWED, player1Moves, player2Moves);
+	    }
+	} else {
+	    std::cout << "cant use letters, game is ending" << std::endl;
 	    playGame = 0;
 	}
-	// print out the new state of the game
+	++player;
+	// temporary hack to get rid of infinite strange behavior
+	if (curPlayer == 1) {
+	    player1Moves[player1N] = playerInput;
+	    ++player1N;
+	} else {
+	    player2Moves[player2N] = playerInput;
+	    ++player2N;
+	}
+	// check if game should end
+        if (playerInput == EXIT_COMMAND || player2N > 4 || player1N > 4) {
+	    playGame = 0;
+	}
 	// how do I update the board state?
     } while (playGame == 1);
     // that's all folks
